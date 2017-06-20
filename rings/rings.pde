@@ -11,13 +11,13 @@ void setup() {
 void draw() {
   background(50);
 
-  //if (growing) {
-  //  originCircleSize += 2;
-  //  if (originCircleSize > 0) growing = false;
-  //} else {
-  //  originCircleSize -=2;
-  //  if (originCircleSize < -800) growing = true;
-  //}
+  if (growing) {
+    originCircleSize += 2;
+    if (originCircleSize > 0) growing = false;
+  } else {
+    originCircleSize -=2;
+    if (originCircleSize < -800) growing = true;
+  }
 
   println(originCircleSize);
 
