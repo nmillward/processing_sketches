@@ -1,6 +1,6 @@
- 
-float maxSpeed = 1.0;
-float maxForce = 0.025;
+
+float maxSpeed = 2.0;
+float maxForce = 0.03;
 
 class Unit {  
   PVector position, velocity, acceleration;
@@ -10,7 +10,7 @@ class Unit {
     position = new PVector(x, y);
     velocity = new PVector(random(-1, 1), random(-1, 1));
     acceleration = new PVector(0, 0);
-    radius = 4.0;
+    radius = 3.0;
   }
 
   void run(ArrayList<Unit> units) {
@@ -38,29 +38,31 @@ class Unit {
     pushMatrix();
     translate(position.x, position.y);
     rotate(theta);
-    
+
     beginShape(QUADS);
     vertex(-radius*2, -radius*2);
     vertex(-radius*2, radius*2);
     vertex(radius*2, radius*2);
     vertex(radius*2, -radius*2);
     endShape();
-    
+
     popMatrix();
-    
   }
 
   void flock(ArrayList<Unit> units) {
     //PVector separation = separate(units);
     PVector alignment = align(units);
-    
+    PVector separation = separate(units);
+
     alignment.mult(4.0);
-    
+    separation.mult(10.0);
+
     applyForce(alignment);
+    applyForce(separation);
   }
-  
+
   void applyForce(PVector force) {
-    acceleration.add(force); 
+    acceleration.add(force);
   }
 
   void screenEdge() {
@@ -76,26 +78,46 @@ class Unit {
 
   //}
 
-  //PVector separate(ArrayList<Unit> units) {
+  PVector separate(ArrayList<Unit> units) {
+    float separationDist = 20.0;
+    PVector steer = new PVector(0, 0);
+    int count = 0;
 
-  //  PVector steer = new PVector(0, 0);
+    for (Unit neighbor : units) {
+      float distance = PVector.dist(position, neighbor.position);
+      if ((distance > 0) && (distance < separationDist)) {
+        PVector difference = PVector.sub(position, neighbor.position);
+        difference.normalize();
+        difference.div(distance);
+        steer.add(difference);
+        count++;
+      }
+    }
 
-  //  return steer;
-  //}
+    if (count > 0) {
+      steer.div((float) count);
+      steer.normalize();
+      steer.mult(maxSpeed);
+      steer.sub(velocity);
+      steer.limit(maxForce);
+    }
+
+    return steer;
+  }
 
   PVector align(ArrayList<Unit> units) {
     float neighborDist = 25.0;
     PVector steer = new PVector();
     int count = 0;
-    
-    for(Unit neighbor : units) {
+
+    for (Unit neighbor : units) {
       float d = PVector.dist(position, neighbor.position);
       if ((d > 0) && (d < neighborDist)) {
         steer.add(neighbor.velocity);
         count++;
       }
     }
-    
+
     if (count > 0) {
       steer.div((float)count);
       // Steering = Desired - Velocity
