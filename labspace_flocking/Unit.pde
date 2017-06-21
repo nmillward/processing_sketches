@@ -53,12 +53,15 @@ class Unit {
     //PVector separation = separate(units);
     PVector alignment = align(units);
     PVector separation = separate(units);
+    PVector cohesiveness = cohesion(units);
 
     alignment.mult(4.0);
-    separation.mult(10.0);
+    separation.mult(20.0);
+    cohesiveness.mult(5.0);
 
     applyForce(alignment);
     applyForce(separation);
+    applyForce(cohesiveness);
   }
 
   void applyForce(PVector force) {
@@ -72,11 +75,18 @@ class Unit {
     if (position.y > height + radius) position.y = -radius;
   }
 
-  //PVector seek(PVector target) {
-  //  PVector desired = PVector.sub(target, position);
+  PVector seek(PVector target) {
+    PVector desired = PVector.sub(target, position);
 
-
-  //}
+    desired.normalize();
+    desired.mult(maxSpeed);
+    
+    //Steering = Desired - Velocity
+    PVector steer = PVector.sub(desired, velocity);
+    steer.limit(maxForce);
+    
+    return steer;
+  }
 
   PVector separate(ArrayList<Unit> units) {
     float separationDist = 20.0;
@@ -129,9 +139,24 @@ class Unit {
     return steer;
   }
 
-  //PVector cohesion(ArrayList<Unit> units) {
-
-  //  PVector 
-
-  //}
+  PVector cohesion(ArrayList<Unit> units) {
+    float neighborDist = 40.0;
+    PVector sum = new PVector(0, 0);
+    int count = 0;
+    
+    for (Unit neighbor : units) {
+      float d = PVector.dist(position, neighbor.position);
+      if ((d > 0) && (d < neighborDist)) {
+        sum.add(neighbor.position);
+        count++;
+      }
+    }
+    
+    if (count > 0) {
+      sum.div((float) count);
+      return seek(sum);
+    }
+     
+    return sum;
+  }
 }
