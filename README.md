@@ -6,3 +6,6 @@ Experimental Processing Sketches
 
 ### Fibonacci (Balls)
 ![balls](https://user-images.githubusercontent.com/4249779/32146935-0b7b1f2c-bcb5-11e7-82b2-7fab5960b535.gif)
+
+### Parametric Lines
+![parametriclines](https://user-images.githubusercontent.com/4249779/32148072-7a304714-bcc7-11e7-9bed-225dd1811744.gif)
