@@ -1,6 +1,7 @@
+color unitColor;
 
-float maxSpeed = 2.0;
-float maxForce = 0.03;
+float maxSpeed = 3.0;
+float maxForce = .03;
 
 class Unit {  
   PVector position, velocity, acceleration;
@@ -10,7 +11,7 @@ class Unit {
     position = new PVector(x, y);
     velocity = new PVector(random(-1, 1), random(-1, 1));
     acceleration = new PVector(0, 0);
-    radius = 3.0;
+    radius = 2.0;
   }
 
   void run(ArrayList<Unit> units) {
@@ -33,7 +34,7 @@ class Unit {
   void render() {
     // draw Unit shape in direction of velocity
     float theta = velocity.heading() + radians(90);
-    noFill();
+    //fill(200);
     stroke(200);
     pushMatrix();
     translate(position.x, position.y);
@@ -50,14 +51,13 @@ class Unit {
   }
 
   void flock(ArrayList<Unit> units) {
-    //PVector separation = separate(units);
     PVector alignment = align(units);
     PVector separation = separate(units);
     PVector cohesiveness = cohesion(units);
 
-    alignment.mult(4.0);
-    separation.mult(20.0);
-    cohesiveness.mult(5.0);
+    alignment.mult(1.0);
+    separation.mult(3.8);
+    cohesiveness.mult(2.0);
 
     applyForce(alignment);
     applyForce(separation);
@@ -68,23 +68,16 @@ class Unit {
     acceleration.add(force);
   }
 
-  void screenEdge() {
-    if (position.x < -radius) position.x = width + radius;
-    if (position.y < -radius) position.y = height + radius;
-    if (position.x > width + radius) position.x = -radius;
-    if (position.y > height + radius) position.y = -radius;
-  }
-
   PVector seek(PVector target) {
     PVector desired = PVector.sub(target, position);
 
     desired.normalize();
     desired.mult(maxSpeed);
-    
+
     //Steering = Desired - Velocity
     PVector steer = PVector.sub(desired, velocity);
     steer.limit(maxForce);
-    
+
     return steer;
   }
 
@@ -136,6 +129,7 @@ class Unit {
       steer.sub(velocity);
       steer.limit(maxForce);
     }
+    
     return steer;
   }
 
@@ -143,7 +137,7 @@ class Unit {
     float neighborDist = 40.0;
     PVector sum = new PVector(0, 0);
     int count = 0;
-    
+
     for (Unit neighbor : units) {
       float d = PVector.dist(position, neighbor.position);
       if ((d > 0) && (d < neighborDist)) {
@@ -151,12 +145,19 @@ class Unit {
         count++;
       }
     }
-    
+
     if (count > 0) {
       sum.div((float) count);
       return seek(sum);
     }
-     
+
     return sum;
+  }
+
+  void screenEdge() {
+    if (position.x < -radius) position.x = width + radius;
+    if (position.y < -radius) position.y = height + radius;
+    if (position.x > width + radius) position.x = -radius;
+    if (position.y > height + radius) position.y = -radius;
   }
 }

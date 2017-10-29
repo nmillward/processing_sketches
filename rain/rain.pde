@@ -17,8 +17,8 @@ void setup() {
 void draw() {
   background(50);
   
-  sun.show();
-  sun.pulse();
+  //sun.show();
+  //sun.pulse();
 
   for (int i = 0; i < drops.length; i++) {
     drops[i].fall();
